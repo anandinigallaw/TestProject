@@ -71,7 +71,7 @@ public void click_Go_button() {
 
 @Then("validate the countdown")
 public void validate_the_countdown() {
-    
+	String Expected = null;    
 	try{
 		WebDriverWait checktimerload = new WebDriverWait(driver, 100);
 		checktimerload.until(ExpectedConditions.visibilityOfElementLocated(By.id("progressText")));
@@ -86,43 +86,51 @@ public void validate_the_countdown() {
 				j++;
 			}
 		}
-		String Expected = null;
+		int timelength = Countdowntime.length;
 		i = Countdowntime.length - 1;
-			while (Countdowntime[i] > 0) {
-				if (Countdowntime.length == 2) {
-					if ((Countdowntime[0] > 1) && (Countdowntime[1] == 1)) {
-						Expected = Integer.toString(Countdowntime[0]) + " minutes "+  " 1 second";
-						Countdowntime[0]--;
-						} 
-					else if ((Countdowntime[0] == 1) && (Countdowntime[1] > 1))
-						Expected = Integer.toString(Countdowntime[0]) + " minute "+ Integer.toString(Countdowntime[1] - 1) + " seconds";
-					else if ((Countdowntime[0] == 1) && (Countdowntime[1] == 1))
-						Expected = Integer.toString(Countdowntime[0]) + " minute "+ Integer.toString(Countdowntime[1] - 1) + " second";
-					else
-						Expected = Integer.toString(Countdowntime[0]) + " minutes "+ Integer.toString(Countdowntime[1] - 1) + " seconds";
-				} else if (Countdowntime.length == 1){
-					if (Countdowntime[i] == 1) {
-						Expected = "1 second";
-						WebDriverWait wait = new WebDriverWait(driver, 100);
-						wait.until(ExpectedConditions.alertIsPresent());
-						driver.switchTo().alert().accept();
-						driver.quit();
+		while (Countdowntime[i] >= 0) {
+			if (timelength == 1){
+				if (Countdowntime[i] == 2) {
+					Expected = "1 second";
+					WebDriverWait wait = new WebDriverWait(driver, 3);
+					wait.until(ExpectedConditions.alertIsPresent());
+					driver.switchTo().alert().accept();
+					driver.switchTo().defaultContent();
+					Thread.sleep(4000);
+					driver.close();
+				} else
+					Expected = Integer.toString(Countdowntime[i] - 1) + " seconds";
+			} else if (timelength == 2) {
+				if(Countdowntime[i] == 1){
+					if(Countdowntime[0]>1)
+						Expected = Integer.toString(Countdowntime[0]) + " minutes";
+					else {
+						Expected = "1 minute";
+						timelength--;
 					}
-					else
-						Expected = Integer.toString(Countdowntime[0] - 1) + " seconds";
-				}
-				
-				if(Expected != "1 second"){
-				WebDriverWait wait = new WebDriverWait(driver, 100);
-				wait.until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.id("progressText")),Expected));
-				Assert.assertEquals(driver.findElement(By.id("progressText")).getText(), Expected);
-				System.out.println("Actual: " + driver.findElement(By.id("progressText")).getText());
-				System.out.println("Expected: " + Expected);
-				} 
-				Countdowntime[i]--;
+					Countdowntime[0]--;
+					Countdowntime[i] = 61;
+					Thread.sleep(900);
+				}else if ((Countdowntime[0] > 1) && (Countdowntime[1] == 2))
+					Expected = Integer.toString(Countdowntime[0]) + " minutes "+  "1 second";
+				else if ((Countdowntime[0] == 1) && (Countdowntime[1] > 2))
+					Expected = "1 minute "+ Integer.toString(Countdowntime[1] - 1) + " seconds";
+				else if ((Countdowntime[0] == 1) && (Countdowntime[1] == 2))
+					Expected = "1 minute 1 second";
+				else
+					Expected = Integer.toString(Countdowntime[0]) + " minutes "+ Integer.toString(Countdowntime[1] - 1) + " seconds";
+			} 
+			if(Expected != "1 second"){
+			WebDriverWait wait = new WebDriverWait(driver, 100);
+			wait.until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.id("progressText")),Expected));
+			System.out.println("Actual: " + driver.findElement(By.id("progressText")).getText());
+			System.out.println("Expected: " + Expected);
+			Assert.assertEquals(driver.findElement(By.id("progressText")).getText(), Expected);
+			Countdowntime[i]--;
 			}
+		}
 		} catch (Exception e) {
-			driver.quit();
+			System.out.println(e);
 		}
 }
 
